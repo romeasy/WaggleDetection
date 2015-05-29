@@ -11,9 +11,9 @@ def getVideoMat(video, startFrame, frameCount, targetSize):
     cont, mat = video.read()
     mat = cv2.cvtColor(mat, cv2.COLOR_BGR2GRAY)
     mat = cv2.resize(mat, targetSize, 0, 0, cv2.INTER_AREA)
-    lastFrame = lambda x : x.get(cv2.cv.CV_CAP_PROP_POS_FRAMES) >= (startFrame + frameCount)
+    lastFrame = lambda : video.get(cv2.cv.CV_CAP_PROP_POS_FRAMES) >= (startFrame + frameCount)
 
-    while (not lastFrame(video)):
+    while (not lastFrame()):
         cont, nextFrame = video.read()
         if not cont: break
         nextFrame = cv2.cvtColor(nextFrame, cv2.COLOR_BGR2GRAY)
