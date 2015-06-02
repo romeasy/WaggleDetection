@@ -47,24 +47,24 @@ def getVideoMat(video, startFrame, frameCount, targetSize):
 #Erstes Argument sind die Werte eines Pixels über die Zeit
 #TODO: Im Paper sind die werte von pix noch auf -1, -1 reduziert.
 def score(pix, freq_index):
-	valSin = sum([pow(pix[m]*SIN[freq_index][m],2) for m in range (0, FRAMES)])
-	valCos = sum([pow(pix[m]*COS[freq_index][m],2) for m in range (0, FRAMES)])
-	return(valSin+valCos)
+    valSin = sum([pow(pix[m]*SIN[freq_index][m],2) for m in range (0, FRAMES)])
+    valCos = sum([pow(pix[m]*COS[freq_index][m],2) for m in range (0, FRAMES)])
+    return(valSin+valCos)
 
 #Signal Generation
 #scores sind die Werte der Score Funktion für alle Frequenzen für einen Pixel
 #max und min enthält das Maximum bzw. Minimum der Werte des Pixels entlang der Zeit
 #TODO: fängt w bei 0 oder 1 an??
 def potential(scores, max_val, min_val):
-	A = max_val-min_val;
-	myScores = deepcopy(scores)
-	myScores.sort()
-	summe = A * sum([w*myScore[w] for w in range(0, len(myScores))])
-	
+    A = max_val-min_val;
+    myScores = deepcopy(scores)
+    myScores.sort()
+    summe = A * sum([w*myScore[w] for w in range(0, len(myScores))])
+
 def signal(threshold, potential):
-	if(potential > threshold):
-		return(1)
-	return(0)
+    if(potential > threshold):
+        return(1)
+    return(0)
 
 if __name__ == "__main__":
     import sys
