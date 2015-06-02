@@ -1,5 +1,24 @@
+# -*- coding: UTF-8 -*-
+
 import cv2
 import numpy as np
+from file_input import get_path
+from math import pi,sin,cos,pow
+from copy import deepcopy
+
+
+#Framerate -> Samplerate
+SR = 100
+FRAMES = 32
+FREQ_min = 11
+FREQ_max = 17
+#Die Frequenzen die wir Analysieren wollen
+FREQS = [x for x in range(FREQ_min, FREQ_max+1)]
+#Die samples der Sinusfunktion
+#Erste Dimension ist Frequenz, zweite Dimension sind die Samples
+SIN = [[sin(2*pi*r*(1/SR)*k) for k in range(0, SR)] for r in FREQS]
+COS = [[cos(2*pi*r*(1/SR)*k) for k in range(0, SR)] for r in FREQS]
+
 
 #   get frameCount frames of video starting at startFrame;
 #   they are resized to targetSize. 
@@ -22,12 +41,41 @@ def getVideoMat(video, startFrame, frameCount, targetSize):
 
     return mat
 
+#Frequency Score Calculation
+
+#Unsere Score-Funktion
+#Erstes Argument sind die Werte eines Pixels über die Zeit
+#TODO: Im Paper sind die werte von pix noch auf -1, -1 reduziert.
+def score(pix, freq_index):
+	valSin = sum([pow(pix[m]*SIN[freq_index][m],2) for m in range (0, FRAMES)])
+	valCos = sum([pow(pix[m]*COS[freq_index][m],2) for m in range (0, FRAMES)])
+	return(valSin+valCos)
+
+#Signal Generation
+#scores sind die Werte der Score Funktion für alle Frequenzen für einen Pixel
+#max und min enthält das Maximum bzw. Minimum der Werte des Pixels entlang der Zeit
+#TODO: fängt w bei 0 oder 1 an??
+def potential(scores, max_val, min_val):
+	A = max_val-min_val;
+	myScores = deepcopy(scores)
+	myScores.sort()
+	summe = A * sum([w*myScore[w] for w in range(0, len(myScores))])
+	
+def signal(threshold, potential):
+	if(potential > threshold):
+		return(1)
+	return(0)
 
 if __name__ == "__main__":
     import sys
-    
-    video = cv2.VideoCapture(sys.argv[1])
-    imgMat = getVideoMat(video, int(sys.argv[2]), 32, (160, 120))
+    videoFile = None
+    video = None
+    if(len(sys.argv)>1):
+        videoFile = sys.argv[1]
+    else:
+        videoFile = get_path()
+    video = cv2.VideoCapture(videoFile)
+    imgMat = getVideoMat(video, int(sys.argv[2]), FRAMES, (160, 120))
     video.release()
 
 #   compute dft along last (time) dimension
